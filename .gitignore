@@ -1,5 +1,5 @@
 .env
 venv/
-* .csv
-* .zip
+*.csv
+*.zip
 kaggle_csv_files/
