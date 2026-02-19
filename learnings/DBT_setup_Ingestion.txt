@@ -1,0 +1,48 @@
+18th Feb:
+
+I configured a pipeline in the notebook today to load the local files which I downloaded from kaggle to the staging schema in the 
+snowflake and I initialized a dbt project while battling some errors. Here are my learnings for this day.
+
+-------1. Setting up the .env files---------
+Had a tough time dealing with the dbt debug error in which dbt wasn't able to connect to Snowflake due to connection issues. First, 
+I thought it could be the issue of env variables not specified properly, which wasn't the case with python connector. After a few debugging sessions
+it is found that I shouldn't have used quotes in the .env file for the key-value pairs. Hence, lookout for connection issues 
+in the ~/.dbt secret folder, profiles.yml, in which you'll configure the connection to the DB.
+
+----2. .env variables are not auto inherited by dbt -----
+After initial setup of dbt, you can chose to use .env variables instead of hardcoding values. However, you must remember that the env files are not 
+read by dbt. For that you should export those vars for the dbt to read from. To do that, use set -a; source .env; set +a in the root folder
+and dbt debug in the dbt folder and you're good. 
+
+set -a --> Tells bash to auto export every variable that gets defined.
+source .env --> reads the file and loads each line as a variable
+set +a --> turns off the auto export
+You'll need to run these commands every time you open a new terminal. This won't be an issue when we orchestrate or dockerize.
+
+==> Use cat -A .env at the root folder, it will show you all the variables you mentioned in the .env and you can see some weird text
+if you use windows editor, etc and that could cause connection issues. To strip them use "sed -i 's/\r$//' .env
+
+
+---3. Trial account limitations---
+Unlike google colab which allows you to directly download files from kaggle API, snowflake trial account couldn't offer that feasibility and 
+any file >50mb can't be uploaded as well. So, I downloaded the files to local and then staged to snowflake.
+
+---4. PUT and copy into ----
+cursor.execute(f"PUT 'file://{file_path}' @olist_raw_stage AUTO_COMPRESS=FALSE OVERWRITE=TRUE;"); basically puts the file path and file name to the stage location in snowflake
+CREATE OR REPLACE TABLE RAW.{table_name}
+                            USING TEMPLATE (
+                            SELECT ARRAY_AGG(OBJECT_CONSTRUCT(*))
+                            FROM TABLE (
+                                INFER_SCHEMA(
+                                LOCATION => '@olist_raw_stage/{filename}',
+                                FILE_FORMAT => 'olist_csv_format')))
+I used the infer schema to create the table making CDC dynamic. For this to work however, you need to have parse_header in the FILE_FORMAT
+specification. It returns a result set where each row reps a col it found in the csv, with col_name, type, nullable metadata
+
+OBJECT_CONSTRUCT: INFER_SCHEMA returns rows, but using TEMPLATE takes json objects , hence this will convert the rows to json objects
+ARRAY_AGG: Bundler--> It aggregates all the objects into one single list 
+
+
+
+
+locals() --> its a dictionary that has the variables that you used in the session, we used it to check if conn is present in it and if true we close the connection.
