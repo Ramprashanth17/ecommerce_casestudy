@@ -1,0 +1,14 @@
+sources:
+  - name: RAW
+    database: "{{ env_var('SNOWFLAKE_DATABASE') }}"
+    schema: RAW
+    tables:
+      - name: CUSTOMERS
+      - name: ORDERS
+      - name: ORDER_ITEMS
+      - name: PRODUCTS
+      - name: GEOLOCATION
+      - name: ORDER_PAYMENTS
+      - name: ORDER_REVIEWS
+      - name: SELLERS
+      - name: PRODUCT_CATEGORY_NAME_TRANSLATION
