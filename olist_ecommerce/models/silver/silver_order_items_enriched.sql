@@ -21,4 +21,4 @@ ELSE 0
 END AS is_late
 FROM {{ ref('bronze_order_items') }} as boi
 LEFT JOIN {{ ref('bronze_orders') }} as bo
-ON bo.order_id = boi.order_id;
+ON bo.order_id = boi.order_id
