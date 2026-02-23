@@ -27,6 +27,8 @@ if you use windows editor, etc and that could cause connection issues. To strip 
 Unlike google colab which allows you to directly download files from kaggle API, snowflake trial account couldn't offer that feasibility and 
 any file >50mb can't be uploaded as well. So, I downloaded the files to local and then staged to snowflake.
 
+20 Feb:
+
 ---4. PUT and copy into ----
 cursor.execute(f"PUT 'file://{file_path}' @olist_raw_stage AUTO_COMPRESS=FALSE OVERWRITE=TRUE;"); basically puts the file path and file name to the stage location in snowflake
 CREATE OR REPLACE TABLE RAW.{table_name}

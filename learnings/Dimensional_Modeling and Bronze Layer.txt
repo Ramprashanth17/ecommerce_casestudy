@@ -1,0 +1,21 @@
+21 and 22 Feb:
+
+Once the initial setup of DBT folder has done, now it is time for me to do the data transoformations to the data
+based on the requirements. Initially, I charted out 3 requirements and will increment on it based on growing requirements
+and use cases. This will also help in designing a scalabe data model and let me be flexible.
+
+Here are the 3 initial business requirements:
+Requirement 1: "I need to understand our revenue performance. How much are we making over time? Which product categories drive the most revenue? I want to see this monthly."
+Requirement 2: "Our delivery experience is a problem. I need to know what percentage of orders are delivered late versus on time, and which states have the worst delivery performance."
+Requirement 3: "I want to understand our customer base. How many customers do we have by state? What's the average order value? Are there customers who've ordered more than once?"
+
+Instead of jumping right away, it is always the best to ask qualifying questions to get a clear cut idea on what exactly are the requirements, so that you don't assume
+something you thought applicable, but the business team might thought otherwise. "Don't Assume, get Clarity!". 
+By asking questions, you'll also cut off unwanted columns or data that may not add much value.
+
+In this case, I asked the following questions to get a clear idea:
+
+1. Performance: What exactly you mean by performance, how is it calculated? what are your metrics to measure the performance. 
+2. In the 2nd requirement, it says they need to know states having worst delivery performance, is it the percentage of late deliveries to the on-time deliveries, review based performance?
+3. Requirement 3 is fairly clear, but you can drill to know more about further requirements.
+
