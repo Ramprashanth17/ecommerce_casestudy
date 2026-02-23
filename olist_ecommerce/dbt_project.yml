@@ -42,3 +42,7 @@ models:
     gold:
       +materialized: table
       +schema: gold
+    
+seeds:
+  olist_ecommerce_dbt_transformations:
+    +schema: seeds
