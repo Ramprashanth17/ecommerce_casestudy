@@ -19,3 +19,53 @@ In this case, I asked the following questions to get a clear idea:
 2. In the 2nd requirement, it says they need to know states having worst delivery performance, is it the percentage of late deliveries to the on-time deliveries, review based performance?
 3. Requirement 3 is fairly clear, but you can drill to know more about further requirements.
 
+Now that our initial requirements are clear, let's get ahead with dimensional modeling:
+
+Before that, our bronze layer consists of minor changes from the source files such as renaming col names and its data types to the 
+suitable data types for our database. Snowflake, by default names all the columns to upper case and if the col names are different, you can't query them using lower-case column names or different case,
+you've to use quotes to refer those tables properly. We'll address these issues in the bronze layer.
+
+In the DBT, you need to update the dbt_project.yml file with the schemas and the materializations you want.
+It is suggested to go with views for bronze layer, so that you can safely refer to the raw schema for src files. 
+And tables for the other schemas.
+
+Also, you need to create a new file in the particular schema folder. Since, we're dealing with bronze, I'll create
+a source.yml file, with the database connection details, RAW schema and the tables present in that schema, it allows dbt to refer to the specific tables in the schema.
+
+Okie, now for the dimensional modeling.
+
+Based on the 4 steps of dimensional modeling by Kimball:
+1. Declare the business process: In this case, our business process is clear, it's an ecommerce setup and our data is related to transactions of orders.
+2. Declare the grain: This is the most important step, we need to select the grain at atomic level so that our model is flexible yet durable for scaling and also to evolve for additional business requests
+3. Identify the dimensions: This gives you the context of the business events. 
+4. Identify the Fact: This gives the answer to what exactly is the process measuring?
+
+In our case, business process is clear and we need to declare grain. Here I chose the atomic grain of item per transaction and not an order. 
+i.e, In the fact table, each row represents a transaction of an order of items. This is the atomic level and from this you can roll-up and you can do detailed analysis. 
+If you chose this grain, each row representing an order at a time, you might lose valuable information on the items placed in an order. This can cause problems when you want to do item-level analysis.
+
+Dimension tables: Products, Customer, Location, Date, these are my dimensions as they give context to the business process or the sale transactions.
+
+Fact tables: Order Items table is our fact table as it has the atomic grain of item of an order per row.
+
+---------------------- Design Challenges and Trade-offs -----------------------------------
+
+1. Location Dimension: In the source table, latitude and longitude are distinct  or different and all the other columns such as city, state and zipcode are repeated.
+
+---> Since the customers, sellers have the same repeated information of address, I chose to create this separate dimension. It can be joined with the respective table with the location_fk
+Our requirement here is the state level performance, which can be drilled down to city level. One zipcode can have multiple lat/long values, when you join the customer table based on zipcode, it maps to >10 places and our fact table explodes in row count.
+Hence, I chose to go with one row per zipcode as my deduplication strategy, I can chose one lat/long as representative of the zipcode.
+
+2. Product Dimension: It is farily easy as you need to have the columns related to product, such as its id, category, name, etc.
+However, I initially made the mistake of keeping the product dimension columns in the fact table. I though fact table is all about measures and dimensions are also a measure.
+That's where I made a mistake, the dimensions tells you about the product and it doesn't act as a measure related to the transaction.
+Measures are numeric values that you aggregate such as SUM, AVG, COUNT. Product dimensions are non-aggregates.
+
+3. Date: This is the default dimension. Initially, I kept one date per row. But date dimension is for Year, Month, Quarter, etc.
+It acts as a lookup for dates and you join the fact table to the date_dim to get the calendar attributes. 
+What would be our fk, that can connect with the fact? Purchase date would be appropriate as it's from when a business event is occured. 
+
+4. Fact Table: Initially, I thought of keeping order_status in a separate dimension, this is an overkill for our design. Because, the order_status hardly contains 4 or 5 different values and these can be added to the 
+fact table directly. You can also add derived columns to the fact table that makes the analyst life easy. In this case, I've added, is_late, days_late, etc, which helps in analysing the delivery performance. 
+
+Well, that's it our dimensional model for the initial requirements are done. I made sure that it can be extended and it is flexible. 
