@@ -1,3 +1,5 @@
+-- depends_on: {{ ref('bronze_geolocation') }}
+
 WITH padded_zipcode AS (
     SELECT 
     *,

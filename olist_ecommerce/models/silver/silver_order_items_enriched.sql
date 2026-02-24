@@ -1,3 +1,6 @@
+-- depends_on: {{ ref('bronze_order_items') }}
+-- depends_on: {{ ref('bronze_orders') }}
+
 SELECT 
 bo.order_id,
 bo.customer_id, 
