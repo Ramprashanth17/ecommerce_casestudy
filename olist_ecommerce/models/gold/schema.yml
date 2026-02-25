@@ -1,0 +1,50 @@
+models:
+  - name: gold_dim_customers
+    columns:
+      - name: customer_sk
+        data_tests:
+          - unique
+          - not_null
+  - name: gold_dim_location
+    columns:
+      - name: location_sk
+        data_tests:
+          - unique
+          - not_null
+  - name: gold_dim_products
+    columns:
+      - name: product_sk
+        data_tests:
+          - unique
+          - not_null
+
+  - name: gold_dim_date
+    columns:
+      - name: date_sk
+        data_tests:
+          - unique
+          - not_null
+
+  - name: gold_fct_order_items
+    columns:
+      - name: order_sk
+        data_tests:
+          - unique
+          - not_null
+      - name: product_fk
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('gold_dim_products')
+                field: product_sk
+      - name: customer_fk
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('gold_dim_customers')
+                field: customer_sk
+      - name: order_status
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['delivered', 'approved', 'invoiced', 'canceled', 'unavailable', 'shipped', 'processing']
