@@ -1,33 +1,43 @@
 models:
   - name: gold_dim_customers
+    description: Customer Dimension Table
     columns:
       - name: customer_sk
+        description: Unique key for the Customer Dimension table
+        quote : true
         data_tests:
           - unique
           - not_null
   - name: gold_dim_location
+    description: Location Dimension Table, has the info related to location
     columns:
       - name: location_sk
         data_tests:
           - unique
           - not_null
   - name: gold_dim_products
+    description: Product Dimension table
     columns:
       - name: product_sk
+        description: Surrogate key for the product table
         data_tests:
           - unique
           - not_null
 
   - name: gold_dim_date
+    description: Date Dimension Table
     columns:
       - name: date_sk
+        description: surrogate key for date dimension table
         data_tests:
           - unique
           - not_null
 
   - name: gold_fct_order_items
+    description: Fact Table for the order transactions
     columns:
       - name: order_sk
+        description: surrogate key for the order items
         data_tests:
           - unique
           - not_null
