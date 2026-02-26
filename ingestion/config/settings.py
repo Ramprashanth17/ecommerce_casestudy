@@ -31,7 +31,7 @@ class FilePathConfig:
 class APIConfig:
     """External API keys and endpoints"""
     #frankfurter_api_key: str = os.getenv("")
-    frankfurter_base_url: str = "https://api.frankfurter.dev"
+    frankfurter_base_url: str = "https://api.frankfurter.dev/v1"
     open_weather_api_key: str = os.getenv("OPENWEATHER_API_KEY", "")
     ibge_base_url: str = "https://servicodados.ibge.gov.br/api"
     #ibge_api_key: str = os.getenv("")
