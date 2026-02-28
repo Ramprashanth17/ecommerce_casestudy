@@ -27,7 +27,7 @@ class FrankfurterIngestor:
             df = df.reset_index()
 
             df.columns = ['EXCHANGE_DATE', 'USD_RATE']
-            df['EXCHANGE_DATE'] = pd.to_datetime(df['EXCHANGE_DATE'], unit='ns')
+            #df['EXCHANGE_DATE'] = pd.to_datetime(df['EXCHANGE_DATE'], unit='ns')
             df['EXCHANGE_DATE'] = df['EXCHANGE_DATE'].dt.date
 
             return df
@@ -39,17 +39,32 @@ class FrankfurterIngestor:
     def run_incremental(self):
         cursor = self.client._get_connection().cursor()
         try:
-            cursor.execute("SELECT MAX(EXCHANGE_DATE) FROM RAW_CURRENCY_RATES")
+            cursor.execute("SELECT MAX(EXCHANGE_DATE) FROM RAW.CURRENCY_RATES")
             result = cursor.fetchone()
             if result[0] is None:
                 logger.info("Table is empty. Starting from default date")
-                next_start_date = date(2018-10-31)
+                next_start_date = date(2016, 9, 1)
             else:
                 next_start_date = result[0] + timedelta(days=1)
             
             end_date = date.today()
+
+            if next_start_date < end_date:
+                logger.info(f"Incremental run: {next_start_date} to {end_date}")
+                df = self.fetch_exchange_rates(start_date= next_start_date.isoformat(),
+                                               end_date=end_date.isoformat())
+                
+                if not df.empty:
+                    self.client.load_dataframe(df, table_name="CURRENCY_RATES", overwrite=False)
+            
+            else:
+                logger.info("Data is already upto date.")
+
+        finally:
+            cursor.close()
+            self.client.close_connection()
         
-        except Exception 
+        
 
 
 
@@ -70,7 +85,8 @@ class FrankfurterIngestor:
 
 def main():
     ingestor = FrankfurterIngestor()
-    ingestor.run(start_date='2016-09-01', end_date='2018-10-31')
+    ingestor.run_incremental()
+    #ingestor.run(start_date='2016-09-01', end_date='2018-10-31')
 
 if __name__ == "__main__":
     main()
