@@ -1,5 +1,6 @@
 from ingestion.config.settings import settings
 from ingestion.loaders.snowflake_loader import SnowflakeClient
+from datetime import timedelta, datetime, date
 import pandas as pd
 import requests
 import logging
@@ -34,6 +35,25 @@ class FrankfurterIngestor:
         except Exception as e:
             logger.error(f"API request failed. {e}")
             raise
+    
+    def run_incremental(self):
+        cursor = self.client._get_connection().cursor()
+        try:
+            cursor.execute("SELECT MAX(EXCHANGE_DATE) FROM RAW_CURRENCY_RATES")
+            result = cursor.fetchone()
+            if result[0] is None:
+                logger.info("Table is empty. Starting from default date")
+                next_start_date = date(2018-10-31)
+            else:
+                next_start_date = result[0] + timedelta(days=1)
+            
+            end_date = date.today()
+        
+        except Exception 
+
+
+
+
     
     def run(self, start_date: str, end_date: str):
         try:
