@@ -56,7 +56,17 @@ class FrankfurterIngestor:
                                                end_date=end_date.isoformat())
                 
                 if not df.empty:
-                    self.client.load_dataframe(df, table_name="CURRENCY_RATES", overwrite=False)
+                    # Only keep the rows newer than what we already have
+                    max_existing = result[0]
+                    if max_existing is not None:
+                        df = df[df['EXCHANGE_DATE'] > max_existing]
+                    
+                    if not df.empty:
+                        self.client.load_dataframe(df, table_name='CURRENCY_RATES', overwrite= False)
+                        logger.info(f"Loaded {len(df)} new rows")
+                    else:
+                        logger.info("No new data after filtering. Already up to date.")
+                    
             
             else:
                 logger.info("Data is already upto date.")
