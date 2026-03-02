@@ -28,7 +28,8 @@ class FrankfurterIngestor:
 
             df.columns = ['EXCHANGE_DATE', 'USD_RATE']
             #df['EXCHANGE_DATE'] = pd.to_datetime(df['EXCHANGE_DATE'], unit='ns')
-            df['EXCHANGE_DATE'] = df['EXCHANGE_DATE'].dt.date
+            df['EXCHANGE_DATE'] = pd.to_datetime(df['EXCHANGE_DATE']).dt.date
+            #df['EXCHANGE_DATE'] = pd.to_datetime(df['EXCHANGE_DATE'])
 
             return df
 
